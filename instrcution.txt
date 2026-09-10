@@ -1,0 +1,195 @@
+======================================================================
+                  JS / TS  vs  PYTHON TERMINOLOGY CHEATSHEET
+======================================================================
+
+1. DATA STRUCTURES & TYPES
+----------------------------------------------------------------------
+• JS/TS: Object / Record ({ key: "value" })
+  PYTHON: Dictionary (or "dict") ({ "key": "value" })
+
+• JS/TS: Array ([1, 2, 3])
+  PYTHON: List ([1, 2, 3])
+
+• JS/TS: Tuple ([string, number])
+  PYTHON: Tuple (("hello", 42))
+
+• JS/TS: Set (new Set())
+  PYTHON: Set ({1, 2, 3})
+
+• JS/TS: null / undefined
+  PYTHON: None
+
+• JS/TS: true / false (lowercase)
+  PYTHON: True / False (Capitalized!)
+
+• JS/TS: String / Number / Boolean
+  PYTHON: str / int or float / bool
+
+
+2. SYNTAX & NAMING CONVENTIONS
+----------------------------------------------------------------------
+• JS/TS: camelCase / kebab-case (user-controller.ts, getUserData)
+  PYTHON: snake_case (user_controller.py, get_user_data)
+
+• JS/TS: ClassName (PascalCase)
+  PYTHON: ClassName (PascalCase) - Same for classes/Pydantic models!
+
+• JS/TS: Template Literals (`Hello ${name}`)
+  PYTHON: f-string (f"Hello {name}")
+
+• JS/TS: arrow function (() => {})
+  PYTHON: lambda (lambda x: x + 1)
+
+• JS/TS: function
+  PYTHON: def (short for define)
+
+
+3. WEB & FASTAPI / NESTJS TERMS
+----------------------------------------------------------------------
+• JS/TS (NestJS): DTO / Class Validator
+  PYTHON: Pydantic Model (BaseModel)
+
+• JS/TS: TypeScript Interfaces / Types
+  PYTHON: Type Hints / Type Annotations
+
+• JS/TS: Express req.params / req.query / req.body
+  PYTHON: Path Parameter / Query Parameter / Request Body
+
+• JS/TS: Controller Decorator (@Controller(), @Get())
+  PYTHON: Router Decorator (@router.get(), @router.post())
+
+
+4. PACKAGES & ENVIRONMENT
+----------------------------------------------------------------------
+• JS/TS: node_modules
+  PYTHON: Virtual Environment (venv / .venv)
+
+• JS/TS: package.json
+  PYTHON: requirements.txt (or pyproject.toml)
+
+• JS/TS: npm / yarn / pnpm
+  PYTHON: pip
+
+• JS/TS: file / module
+  PYTHON: Module (a single .py file) / Package (a directory containing .py files)
+
+
+5. ERROR HANDLING
+----------------------------------------------------------------------
+• JS/TS: try { ... } catch (err) { ... }
+  PYTHON: try: ... except Exception as err: ...
+
+• JS/TS: throw new Error("...")
+  PYTHON: raise Exception("...") / raise HTTPException(...)
+
+
+6. HOW TO INSTALL & MANAGE PACKAGES IN PYTHON
+----------------------------------------------------------------------
+• Creating Environment:
+  - Command: `python3 -m venv .venv` (creates isolated `.venv` directory)
+  
+• Activating Environment:
+  - Linux/Mac: `source .venv/bin/activate`
+  - Windows: `.venv\Scripts\activate`
+
+• Installing Packages:
+  - Command: `pip install fastapi` (installs into active .venv)
+
+• Freezing & Installing Dependencies:
+  - Save: `pip freeze > requirements.txt` (like package-lock.json)
+  - Restore: `pip install -r requirements.txt` (like npm install)
+
+• Deactivating Environment:
+  - Command: `deactivate`
+
+
+7. ASYNC PROGRAMMING IN PYTHON (UNDER THE HOOD)
+----------------------------------------------------------------------
+• Node.js vs Python Event Loop:
+  - Node.js has a single global event loop built into V8 (Libuv).
+  - Python uses `asyncio` which also runs an Event Loop!
+  
+• `async` / `await` Keywords:
+  - In Python, declared as `async def my_func():` and called with `await my_func()`.
+  - Exactly like JS Promises/Async-Await under the hood!
+
+• Sync vs Async Routes in FastAPI:
+  - `async def get_user()`: Runs on the main asyncio Event Loop. (Best for Non-blocking I/O like Async DB calls or HTTP requests).
+  - `def get_user()` (normal sync): FastAPI automatically runs normal synchronous functions in a **thread pool** (ThreadPoolExecutor) so synchronous blocking code won't block the main event loop!
+
+• Why FastAPI is Extremely Fast:
+  - Built on Starlette (ASGI web framework) and Pydantic (data validation).
+  - Uses `uvicorn` as the web server, which uses `uvloop` (a ultra-fast C implementation of libuv, the same library underlying Node.js).
+  - Pydantic v2 core is written in Rust, making JSON parsing / validation blazingly fast.
+
+
+8. LATEST PYTHON FEATURES & MODERN SYNTAX (Python 3.10+)
+----------------------------------------------------------------------
+• Union Type Operator (`|` instead of `Union[a, b]` or `Optional`):
+  - JS: `string | null`
+  - Python: `str | None`  (Replaces `Optional[str]`)
+
+• Structural Pattern Matching (`match / case`):
+  - Equivalent to `switch / case` in JS/TS:
+    match status_code:
+        case 200:
+            return "OK"
+        case 404:
+            return "Not Found"
+        case _:
+            return "Unknown"
+
+• Performance Boosts (Python 3.11 / 3.12 / 3.13):
+  - Python 3.11+ introduced "Faster CPython" (10-60% speed improvement).
+  - Enhanced error tracebacks highlighting exact failing expression.
+  - Python 3.13 free-threaded mode (GIL - Global Interpreter Lock removal progress for true multi-threaded CPU concurrency).
+
+
+9. FEATURES PRESENT IN FASTAPI (BUT NOT IN STANDARD PYTHON)
+----------------------------------------------------------------------
+• Automatic Interactive API Docs (Swagger UI & ReDoc):
+  - Standard Python has no web server or API docs.
+  - FastAPI automatically builds `/docs` and `/redoc` from your Python type hints and Pydantic models with zero extra code!
+
+• Dependency Injection System (`Depends`):
+  - Like NestJS Providers/Guards/Injectables (`@Injectable()`).
+  - Allows injecting DB sessions, auth handlers, or common parameters into route handlers automatically via `db: Session = Depends(get_db)`.
+
+• Automatic Request Parsing & Validation (Query, Path, Body, Header, Cookie):
+  - Converts HTTP inputs to declared Python types automatically and returns automatic `422 Unprocessable Entity` JSON responses on failure.
+
+• Background Tasks (`BackgroundTasks`):
+  - Out-of-the-box support for queuing operations (like sending emails) that execute *after* sending the HTTP response back to the client.
+
+• Built-In Authentication & Security Utilities:
+  - Utilities like `OAuth2PasswordBearer`, `HTTPBearer`, and API Key handlers integrated directly into the Swagger UI interactive authorization button.
+
+• Modular APIRouter System (`APIRouter`):
+  - Allows breaking routes into feature modules (like NestJS Controllers) with automatic prefixing, tagging, and sub-router inclusion.
+
+• Automatic Response Filtering & Serialization (`response_model`):
+  - Filters out sensitive data (e.g. hashed passwords) automatically based on output Pydantic DTOs before returning JSON.
+
+
+10. FASTAPI vs DJANGO (AND DJANGO REST FRAMEWORK)
+----------------------------------------------------------------------
+• Framework Type & Architecture:
+  - DJANGO: "Batteries Included" Full-Stack Monolith framework. Comes built-in with ORM, Admin Panel, User Auth, Templating Engine, and Migrations out of the box.
+  - FASTAPI: Modern, lightweight API-first Micro-framework. Gives you full freedom to choose your own ORM (SQLAlchemy, SQLModel, Tortoise ORM), migrations (Alembic), etc.
+
+• Performance & Async Support:
+  - DJANGO: Built originally as synchronous (WSGI). Added async features later, but core components like Django ORM are still historically synchronous-first.
+  - FASTAPI: Native Async-first from day one (ASGI). Uses `asyncio`, `uvicorn`, and `uvloop` for high-throughput, low-latency microservices.
+
+• Data Validation & DTOs:
+  - DJANGO (DRF): Uses Django Serializers (`serializers.Serializer` / `ModelSerializer`).
+  - FASTAPI: Uses Pydantic (`BaseModel`) and standard Python Type Hints.
+
+• API Documentation:
+  - DJANGO: Requires third-party packages (like `drf-spectacular` or `drf-yasg`) to generate Swagger docs.
+  - FASTAPI: Generates Swagger UI `/docs` automatically natively out of the box.
+
+• Best Use Cases:
+  - DJANGO: Best for full-stack monoliths, traditional server-rendered websites, apps needing an instant admin panel, or rapid enterprise prototypes.
+  - FASTAPI: Best for high-performance REST APIs, Microservices, AI/ML model serving, and modern SPA frontends (React/Next.js/Vue/Angular).
+======================================================================
