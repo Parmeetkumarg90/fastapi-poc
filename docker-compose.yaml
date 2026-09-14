@@ -2,8 +2,57 @@ name: fastapi-poc
 
 services:
   backend:
-    build: .
+    image: fast-api-backend:latest
+    container_name: fast-api-backend
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      target: development
+    restart: always
+    tty: true
+    stdin_open: true
+    env_file: .env
     ports:
-      - "5000:5000"
+      - '8002:8000'
     volumes:
       - .:/app
+    networks:
+      - fastapi-poc
+
+  database:
+    image: postgres:17-alpine
+    container_name: fastapi-poc-database
+    restart: always
+    ports:
+      - '${FORWARD_DB_PORT:-5433}:5432'
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres123}
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_DB: ${DB_NAME:-fastapi-poc_ui}
+    volumes:
+      - PG_DATA:/var/lib/postgresql/data
+    networks:
+      - fastapi-poc
+
+  pgAdmin:
+    image: dpage/pgadmin4
+    container_name: fastapi-poc-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@gmail.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+    volumes:
+      - PG_ADMIN:/var/lib/pgadmin
+    restart: always
+    ports:
+      - '${PGADMIN_FORWARD_PORT:-8080}:80'
+    networks:
+      - fastapi-poc
+
+volumes:
+  PG_ADMIN: {}
+  PG_DATA: {}
+
+networks:
+  fastapi-poc:
+    name: fastapi-poc-network
+    external: true

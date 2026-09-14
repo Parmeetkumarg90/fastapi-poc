@@ -192,4 +192,40 @@
 • Best Use Cases:
   - DJANGO: Best for full-stack monoliths, traditional server-rendered websites, apps needing an instant admin panel, or rapid enterprise prototypes.
   - FASTAPI: Best for high-performance REST APIs, Microservices, AI/ML model serving, and modern SPA frontends (React/Next.js/Vue/Angular).
+
+
+11. SPECIAL / MAGIC FILES & DUNDER VARIABLES IN PYTHON
+----------------------------------------------------------------------
+• `__init__.py` (Package Initializer):
+  - Marks a directory as a Python package so it can be imported (`from feature.user import ...`).
+  - JS Equivalent: `index.js` / `index.ts`.
+
+• `__main__.py` (Package Execution Entry Point):
+  - Allows running a directory as a script using `python -m my_package`.
+  - JS Equivalent: `main` entry in `package.json`.
+
+• `pyproject.toml` (Modern Project Configuration):
+  - The unified modern configuration file for Python build systems, dependencies, linters, and formatters (Ruff, Black, Mypy).
+  - JS Equivalent: `package.json` + `tsconfig.json` + `eslintrc.json`.
+
+• `requirements.txt` (Dependencies List):
+  - Simple text file containing list of exact dependencies.
+  - JS Equivalent: `package-lock.json`.
+
+• `__name__ == "__main__"` (Direct Execution Guard):
+  - Checks if a file is being executed directly (`python main.py`) vs imported as a module by another file.
+  - Example:
+    if __name__ == "__main__":
+        print("Running directly!")
+
+• `__file__` (Current File Path):
+  - Returns the absolute path of the current Python script.
+  - JS Equivalent: `__filename` or `import.meta.url`.
+
+• `__doc__` (Module / Class / Function Docstring):
+  - Stores the documentation string written inside `""" ... """` at the top of a file or function.
+
+• `__all__` (Explicit Module Exports):
+  - A list of string names defining what gets exported when another file uses `from my_module import *`.
+  - JS Equivalent: `export { foo, bar }`.
 ======================================================================
