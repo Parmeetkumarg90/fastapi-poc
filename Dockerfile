@@ -1,13 +1,51 @@
-FROM python:3.12-alpine
+ARG PYTHON_IMAGE=python:3.12-alpine
+
+FROM $PYTHON_IMAGE AS base
 WORKDIR /app
 
+RUN apk --no-cache add dumb-init libpq && \
+    addgroup -g 1000 appgroup && \
+    adduser -u 1000 -G appgroup -s /bin/sh -D appuser && \
+    mkdir -p /app /opt/venv && \
+    chown -R appuser:appgroup /app /opt/venv
 
-COPY requirements.txt .
+USER appuser
 
-RUN pip install -r requirements.txt
+FROM base AS development
 
-COPY . .
+USER root
+RUN apk --no-cache add build-base libpq-dev
+USER appuser
 
-EXPOSE 5000
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5000", "--reload"]
+COPY --chown=appuser:appgroup requirements.txt ./
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+COPY --chown=appuser:appgroup . .
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV HOSTNAME="0.0.0.0"
+ENV PORT=8000
+EXPOSE 8000
+
+CMD ["sh", "-c", "exec dumb-init uvicorn main:app --host ${HOSTNAME:-0.0.0.0} --port ${PORT:-8000} --reload"]
+
+FROM base AS production
+WORKDIR /app
+
+COPY --chown=appuser:appgroup --from=development /opt/venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+COPY --chown=appuser:appgroup . .
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV HOSTNAME="0.0.0.0"
+ENV PORT=8000
+EXPOSE 8000
+
+CMD ["sh", "-c", "exec dumb-init uvicorn main:app --host ${HOSTNAME:-0.0.0.0} --port ${PORT:-8000}"]

@@ -32,7 +32,7 @@ ENV HOSTNAME="0.0.0.0"
 ENV PORT=8000
 EXPOSE 8000
 
-CMD ["dumb-init", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+CMD ["sh", "-c", "exec dumb-init uvicorn main:app --host ${HOSTNAME:-0.0.0.0} --port ${PORT:-8000} --reload"]
 
 FROM base AS production
 WORKDIR /app
@@ -48,4 +48,4 @@ ENV HOSTNAME="0.0.0.0"
 ENV PORT=8000
 EXPOSE 8000
 
-CMD ["dumb-init", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["sh", "-c", "exec dumb-init uvicorn main:app --host ${HOSTNAME:-0.0.0.0} --port ${PORT:-8000}"]
