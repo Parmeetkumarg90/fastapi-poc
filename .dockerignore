@@ -34,3 +34,5 @@ archive.zip
 
 .venv
 .env
+.git
+.venv
